@@ -1,0 +1,73 @@
+{% assign popup_info = shop.metafields.popup_test.info.value %}
+{% assign title = popup_info.title %}
+{% assign description = popup_info.description %}
+{% assign btnLabel = popup_info.btnLabel %}
+{% assign bgColor = popup_info.bgColor %}
+{% assign btnColor = popup_info.btnColor %}
+{% assign textColor = popup_info.textColor %}
+{% assign btnLink = popup_info.btnLink %}
+
+{% if shop.metafields.popup_test.info != blank %}
+  <div is="party-button" id="popup">
+    <section class="modal" style="background-color:{{ bgColor }}">
+      <div class="flex">
+        <img>
+        <button class="btn-close">⨉</button>
+      </div>
+      <img
+        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
+        loading="lazy"
+        width="470"
+        height="300"
+      >
+      <div>
+        <h1 style="color:{{ textColor }}">{{ title }}</h1>
+        <p style="color:{{ textColor }}">
+          {{ description }}
+        </p>
+      </div>
+      <button class="btn" style="background-color:{{ btnColor }}">{{ btnLabel }}</button>
+    </section>
+  </div>
+{% endif %}
+
+<script>
+  const modal = document.querySelector('.modal');
+  const closeModalBtn = document.querySelector('.btn-close');
+  const btnOk = document.querySelector('.btn');
+
+  const url = '{{ btnLink }}'
+
+  btnOk.addEventListener('click', () => {
+  console.log(url)
+  location.href = url;
+  });
+
+  // close modal function
+  const closeModal = function () {
+    modal.classList.add('hidden');
+    overlay.classList.add('hidden');
+  };
+
+  // close the modal when the close button and overlay is clicked
+  closeModalBtn.addEventListener('click', closeModal);
+</script>
+
+<style>
+  div[is='party-button'] {
+    position: fixed;
+    top: 35%;
+    right: 60%;
+    z-index: 100;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Party",
+  "target": "head",
+  "stylesheet": "pop-up.css",
+  "javascript": "pop-up.js",
+  "settings": []
+}
+{% endschema %}
