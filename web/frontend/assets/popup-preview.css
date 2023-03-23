@@ -8,7 +8,8 @@
     min-height: 250px;
     position: absolute;
     z-index: 2;
-    top: 20%;
+    top: 10%;
+    left: 25%;
     background-color: #e8dfdf;
     border: 1px solid #ddd;
     border-radius: 15px;
@@ -81,4 +82,11 @@ button {
 
 .hidden {
     display: none;
+}
+
+.page-frame-preview {
+    background-color: #bbbbbb;
+  
+    width: 100%;
+    height: 40rem;
 }

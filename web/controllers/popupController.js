@@ -68,7 +68,6 @@ export const createOrUpdatePopupInfo = async (_req, res) => {
 };
 
 export const getPopupInfo = async (_req, res) => {
-console.log(res.locals);
   try {
     const session = res.locals.shopify.session;
     const shopDomain = session.shop;

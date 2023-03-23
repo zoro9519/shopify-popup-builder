@@ -91,7 +91,7 @@ export default function HomePage() {
     return response;
   };
   return (
-    <Page fullWidth>
+    <Page fullWidth >
       <FullscreenBar>
         <div
           style={{
@@ -103,7 +103,6 @@ export default function HomePage() {
             paddingRight: "1rem",
           }}
         >
-          <Badge status="info">Draft</Badge>
           <div style={{ marginLeft: "1rem", flexGrow: 1 }}>Popup Setting</div>
           <ButtonGroup>
             <Button
@@ -143,6 +142,7 @@ export default function HomePage() {
           />
           <br />
           <TextField
+            multiline={4}
             label="Description"
             value={description}
             onChange={(e) => setDescription(e)}
@@ -201,6 +201,7 @@ export default function HomePage() {
         <Layout.Section secondary>
           <h2
             style={{
+              marginTop: "20px",
               marginBottom: "20px",
               fontSize: "15px",
               fontWeight: "bold",
@@ -208,36 +209,38 @@ export default function HomePage() {
           >
             Preview
           </h2>
-
-          <section
-            className="modal"
-            style={{
-              position: "relative",
-              marginLeft: 50,
-              backgroundColor: bgColor,
-            }}
-          >
-            <div className="flex">
-              <img
-                src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                width={450}
-                height={300}
-              />
-              {/* <button className="btn-close">⨉</button> */}
-            </div>
-            <div>
-              <h1 style={{ color: textColor }}>{title}</h1>
-              <p style={{ color: textColor }}>{description}</p>
-            </div>
-            <button
-              className="btn"
+          <div 
+         className="page-frame-preview">
+            <section
+              className="modal"
               style={{
-                backgroundColor: btnColor,
+                position: "relative",
+                marginLeft: 50,
+                backgroundColor: bgColor,
               }}
             >
-              {btnLabel}
-            </button>
-          </section>
+              <div className="flex">
+                <img
+                  src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
+                  width={450}
+                  height={300}
+                />
+                <button className="btn-close">⨉</button>
+              </div>
+              <div>
+                <h1 style={{ color: textColor }}>{title}</h1>
+                <p style={{ color: textColor }}>{description}</p>
+              </div>
+              <button
+                className="btn"
+                style={{
+                  backgroundColor: btnColor,
+                }}
+              >
+                {btnLabel}
+              </button>
+            </section>
+          </div>
         </Layout.Section>
       </Layout>
       <Frame>{toastMarkup}</Frame>
