@@ -15,6 +15,7 @@ import {
 
 import { useState, useCallback, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
+import { DropZoneExample } from "../components/dropZone";
 
 export default function HomePage() {
   const [title, setTitle] = useState("");
@@ -53,7 +54,6 @@ export default function HomePage() {
             setBtnColor("#000000");
             setTextColor("#000000");
           } else {
-            console.log(data);
             setTitle(data.title);
             setDescription(data.description);
             setBtnLabel(data.btnLabel);
@@ -91,7 +91,7 @@ export default function HomePage() {
     return response;
   };
   return (
-    <Page fullWidth >
+    <Page fullWidth>
       <FullscreenBar>
         <div
           style={{
@@ -165,6 +165,7 @@ export default function HomePage() {
           />
           <br />
           <p>Background Color: </p>
+
           <input
             type="color"
             id="favcolor"
@@ -172,6 +173,7 @@ export default function HomePage() {
             value={bgColor}
             onChange={(e) => {
               setBgColor(e.target.value);
+              console.log(e.target.value);
             }}
           />
 
@@ -196,6 +198,8 @@ export default function HomePage() {
               setTextColor(e.target.value);
             }}
           />
+          <p>Image: </p>
+          <DropZoneExample />
         </Layout.Section>
 
         <Layout.Section secondary>
@@ -209,8 +213,7 @@ export default function HomePage() {
           >
             Preview
           </h2>
-          <div 
-         className="page-frame-preview">
+          <div className="page-frame-preview">
             <section
               className="modal"
               style={{
@@ -225,7 +228,7 @@ export default function HomePage() {
                   width={450}
                   height={300}
                 />
-                <button className="btn-close">⨉</button>
+                {/* <button className="btn-close">⨉</button> */}
               </div>
               <div>
                 <h1 style={{ color: textColor }}>{title}</h1>

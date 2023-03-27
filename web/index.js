@@ -6,7 +6,6 @@ import serveStatic from "serve-static";
 import { connectDB } from "./config/db.js";
 import shopify from "./shopify.js";
 import GDPRWebhookHandlers from "./gdpr.js";
-import { PopupInfo } from "./models/popupModel.js";
 import { applyPopupEndpoints } from "./routes/popup.js";
 import { refreshMetafield } from "./middleware/refreshMetafield.middleware.js";
 

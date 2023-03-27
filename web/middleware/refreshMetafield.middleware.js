@@ -43,5 +43,6 @@ export const refreshMetafield = async (req, res, next) => {
         update: true,
       });
     }
+    
     next();
   };

@@ -1,6 +1,7 @@
 import shopify from "../shopify.js";
 import { PopupInfo } from "../models/popupModel.js";
 
+
 export const createOrUpdatePopupInfo = async (_req, res) => {
   let status = 200;
   let error = null;
@@ -84,3 +85,6 @@ export const getPopupInfo = async (_req, res) => {
     console.log(error);
   }
 };
+
+
+

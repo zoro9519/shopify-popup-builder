@@ -14,8 +14,16 @@
         <img>
         <button class="btn-close">⨉</button>
       </div>
+      {% comment %}
+        <img
+          src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
+          loading="lazy"
+          width="470"
+          height="300"
+        >
+      {% endcomment %}
       <img
-        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
+        src="{{ 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg'| img_url }}"
         loading="lazy"
         width="470"
         height="300"
@@ -36,11 +44,11 @@
   const closeModalBtn = document.querySelector('.btn-close');
   const btnOk = document.querySelector('.btn');
 
-  const url = '{{ btnLink }}'
+  const url = '{{ btnLink }}';
 
   btnOk.addEventListener('click', () => {
-  console.log(url)
-  location.href = url;
+    console.log(url);
+    location.href = url;
   });
 
   // close modal function

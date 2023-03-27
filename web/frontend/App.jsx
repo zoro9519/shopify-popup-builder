@@ -6,6 +6,7 @@ import {
   QueryProvider,
   PolarisProvider,
 } from "./components";
+import { GraphQLProvider } from "./components/providers/GraphQLProvider";
 
 export default function App() {
 
