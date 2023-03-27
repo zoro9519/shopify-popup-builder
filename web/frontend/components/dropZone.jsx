@@ -2,8 +2,6 @@ import { DropZone, Thumbnail } from "@shopify/polaris";
 import { NoteMinor } from "@shopify/polaris-icons";
 import { useState, useCallback, useEffect } from "react";
 import { useAuthenticatedFetch } from "../hooks";
-import graphql from "../service/graphql";
-import { useAppQuery } from "../hooks";
 import useGraphql from "../hooks/useGraphql";
 
 
@@ -33,20 +31,126 @@ export function DropZoneExample() {
           }
         }
       `;
-  
-    const result = gql(query, {
-      input: 
-        {
-          filename: name,
-          mimeType: type,
-          resource: 'IMAGE',
-          httpMethod: "POST",
-          fileSize: size.toString(),
-        }
-    
+
+    const result = await gql(query, {
+      input:
+      {
+        filename: name,
+        mimeType: type,
+        resource: 'IMAGE',
+        httpMethod: "POST",
+        fileSize: size.toString(),
+      }
+
     });
-  
+
     return result?.data?.stagedUploadsCreate?.stagedTargets?.[0];
+  };
+
+  const createFileService = async ({ alt, resourceUrl, contentType }) => {
+    const query = `
+      mutation fileCreate($files: [FileCreateInput!]!) {
+        fileCreate(files: $files) {
+          files {
+            ... on MediaImage {
+              alt
+              createdAt
+              id
+              preview {
+                image {
+                  originalSrc
+                }
+              }
+              status
+            }
+            ... on Video {
+              alt
+              createdAt
+              filename
+              id
+              duration
+              status
+              preview {
+                image {
+                  url
+                }
+              }
+              originalSource {
+                url
+              }
+            }
+            ... on GenericFile {
+              id
+              alt
+              createdAt
+              fileStatus
+              mimeType
+              url
+            }
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+    const result = await gql(query, {
+      files: {
+        alt,
+        originalSource: resourceUrl,
+        contentType: 'IMAGE',
+      },
+    });
+    return result?.data?.fileCreate?.files?.[0];
+  };
+
+
+  const getFileByIdService = async (fileId, type) => {
+    const query = `
+      query getImageById($id: ID!) {
+        node(id: $id) {
+          ... on MediaImage {
+            alt
+            createdAt
+            status
+            image {
+              originalSrc
+              width
+              height
+            }
+            id
+          }
+          ... on Video {
+            alt
+            createdAt
+            filename
+            id
+            status
+            duration
+            preview {
+              image {
+                url
+              }
+            }
+            originalSource {
+              url
+            }
+          }
+          ... on GenericFile {
+            alt
+            createdAt
+            fileStatus
+            id
+            url
+          }
+        }
+      }
+    `;
+
+
+    const result = await gql(query, { id: fileId });
+    return result
   };
 
   const uploadImgHandle = async (file) => {
@@ -58,13 +162,34 @@ export function DropZoneExample() {
       size,
       resource: mediaType,
     });
-    // const { url, parameters, resourceUrl } = result;
-    console.log({ result });
+    const { url, parameters, resourceUrl } = result;
+    console.log({ url }, { parameters }, { resourceUrl })
+
+
+    const formData = new FormData();
+    parameters.forEach(({ name, value: valueInp }) => {
+      formData.append(name, valueInp);
+    });
+
+    formData.append('file', file);
+
+
+    const method = 'POST'
+    const response = await fetch(url, {
+      method,
+      body: formData,
+      headers: { "Access-Control-Allow-Origin": "*", 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' },
+    });
+    console.log(response)
+    const fileCreated = await createFileService({ alt: file.alt, resourceUrl, contentType: mediaType });
+
+    const res = await getFileByIdService(fileCreated.id, 'IMAGE');
+    console.log(res)
+
   };
 
   useEffect(() => {
     if (file) uploadImgHandle(file);
-    console.log({ file });
   }, [file]);
 
   const validImageTypes = ["image/gif", "image/jpeg", "image/png"];

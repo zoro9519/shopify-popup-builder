@@ -13,13 +13,10 @@ export function applyPopupEndpoints(app) {
     try {
       const session = res.locals.shopify.session;
 
-      console.log(req.body)
-
       const response = await shopify.api.clients.graphqlProxy({
         session,
         rawBody: req.body, // From my app
       });
-      console.log( response );
 
       res.status(200).send(response.body);
     } catch (error) {
