@@ -86,7 +86,45 @@ button {
 
 .page-frame-preview {
     background-color: #bbbbbb;
-  
+
     width: 100%;
     height: 40rem;
+}
+
+/* style color picker */
+
+#style1 {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 150px;
+    height: 50px;
+    background-color: transparent;
+    border: none;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  #style1::-webkit-color-swatch {
+    border-radius: 3px;
+    border: none;
+  }
+  #style1::-moz-color-swatch {
+    border-radius: 15px;
+    border: none;
+  }
+
+  input {
+    width: 200px;
+    height: 45px;
+    border-radius: 4px;
+    border-color: #E0D6D6;
+    border-width: 1px;
+    font-size: medium;
+    font: Courier;
+  }
+
+  .text-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

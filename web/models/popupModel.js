@@ -8,7 +8,8 @@ const popupSchema = mongoose.Schema({
   bgColor: { type: String, required: true },
   textColor: { type: String, required: true },
   btnColor: { type: String, required: true },
-  btnLink: { type: String, default: '' },
+  btnLink: { type: String, default: "" },
+  image: { type: String, required: true },
   status: { type: String, required: true }, //Status show that popup is save or publish
 });
 

@@ -6,6 +6,7 @@
 {% assign btnColor = popup_info.btnColor %}
 {% assign textColor = popup_info.textColor %}
 {% assign btnLink = popup_info.btnLink %}
+{% assign img = popup_info.image %}
 
 {% if shop.metafields.popup_test.info != blank %}
   <div is="party-button" id="popup">
@@ -14,21 +15,15 @@
         <img>
         <button class="btn-close">⨉</button>
       </div>
-      {% comment %}
-        <img
-          src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-          loading="lazy"
-          width="470"
-          height="300"
-        >
-      {% endcomment %}
+
       <img
-        src="{{ 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg'| img_url }}"
+        src="{{img}}"
         loading="lazy"
         width="470"
         height="300"
       >
-      <div>
+
+      <div class="text-container">
         <h1 style="color:{{ textColor }}">{{ title }}</h1>
         <p style="color:{{ textColor }}">
           {{ description }}

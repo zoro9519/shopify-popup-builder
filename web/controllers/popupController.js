@@ -1,7 +1,6 @@
 import shopify from "../shopify.js";
 import { PopupInfo } from "../models/popupModel.js";
 
-
 export const createOrUpdatePopupInfo = async (_req, res) => {
   let status = 200;
   let error = null;
@@ -19,6 +18,7 @@ export const createOrUpdatePopupInfo = async (_req, res) => {
         btnColor: _req.body.btnColor,
         textColor: _req.body.textColor,
         btnLink: _req.body.btnLink,
+        image: _req.body.image,
       };
 
       const metafield = new shopify.api.rest.Metafield({ session });
@@ -48,6 +48,7 @@ export const createOrUpdatePopupInfo = async (_req, res) => {
       popupInfo.textColor = _req.body.textColor;
       popupInfo.btnLink = _req.body.btnLink;
       popupInfo.status = _req.body.status;
+      popupInfo.image = _req.body.image;
       await popupInfo.save();
     } else {
       await PopupInfo.create({
@@ -59,6 +60,7 @@ export const createOrUpdatePopupInfo = async (_req, res) => {
         btnColor: _req.body.btnColor,
         textColor: _req.body.textColor,
         btnLink: _req.body.btnLink,
+        image: _req.body.image,
         status: _req.body.status,
       });
     }
@@ -85,6 +87,3 @@ export const getPopupInfo = async (_req, res) => {
     console.log(error);
   }
 };
-
-
-

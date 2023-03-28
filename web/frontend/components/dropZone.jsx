@@ -1,14 +1,14 @@
 import { DropZone, Thumbnail } from "@shopify/polaris";
 import { NoteMinor } from "@shopify/polaris-icons";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useContext } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import useGraphql from "../hooks/useGraphql";
-
-
+import { imageContext } from "../App";
 export function DropZoneExample() {
   const [file, setFile] = useState();
   const fetch = useAuthenticatedFetch();
-  const gql = useGraphql()
+  const gql = useGraphql();
+  const { imageUrl, updateImageUrl } = useContext(imageContext);
   const handleDropZoneDrop = useCallback(
     (dropFiles, acceptedFiles, rejectedFiles) => {
       setFile(acceptedFiles[0]);
@@ -16,7 +16,14 @@ export function DropZoneExample() {
     []
   );
 
-  const generateStagedUploadService = async ({ name, type, size, resource }) => {
+  updateImageUrl('aa')
+
+  const generateStagedUploadService = async ({
+    name,
+    type,
+    size,
+    resource,
+  }) => {
     const query = `
         mutation generateStagedUploads($input: [StagedUploadInput!]!) {
           stagedUploadsCreate(input: $input) {
@@ -33,15 +40,13 @@ export function DropZoneExample() {
       `;
 
     const result = await gql(query, {
-      input:
-      {
+      input: {
         filename: name,
         mimeType: type,
-        resource: 'IMAGE',
+        resource: "IMAGE",
         httpMethod: "POST",
         fileSize: size.toString(),
-      }
-
+      },
     });
 
     return result?.data?.stagedUploadsCreate?.stagedTargets?.[0];
@@ -99,12 +104,11 @@ export function DropZoneExample() {
       files: {
         alt,
         originalSource: resourceUrl,
-        contentType: 'IMAGE',
+        contentType: "IMAGE",
       },
     });
     return result?.data?.fileCreate?.files?.[0];
   };
-
 
   const getFileByIdService = async (fileId, type) => {
     const query = `
@@ -148,9 +152,8 @@ export function DropZoneExample() {
       }
     `;
 
-
     const result = await gql(query, { id: fileId });
-    return result
+    return result;
   };
 
   const uploadImgHandle = async (file) => {
@@ -163,29 +166,30 @@ export function DropZoneExample() {
       resource: mediaType,
     });
     const { url, parameters, resourceUrl } = result;
-    console.log({ url }, { parameters }, { resourceUrl })
-
-
     const formData = new FormData();
     parameters.forEach(({ name, value: valueInp }) => {
       formData.append(name, valueInp);
     });
 
-    formData.append('file', file);
+    formData.append("file", file);
 
-
-    const method = 'POST'
+    const method = "POST";
     const response = await fetch(url, {
       method,
       body: formData,
-      headers: { "Access-Control-Allow-Origin": "*", 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' },
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      },
     });
-    console.log(response)
-    const fileCreated = await createFileService({ alt: file.alt, resourceUrl, contentType: mediaType });
+    const fileCreated = await createFileService({
+      alt: file.alt,
+      resourceUrl,
+      contentType: mediaType,
+    });
 
-    const res = await getFileByIdService(fileCreated.id, 'IMAGE');
-    console.log(res)
-
+    const res = await getFileByIdService(fileCreated.id, "IMAGE");
+    console.log(res);
   };
 
   useEffect(() => {
