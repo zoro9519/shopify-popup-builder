@@ -8,7 +8,9 @@ import shopify from "./shopify.js";
 import GDPRWebhookHandlers from "./gdpr.js";
 import { applyPopupEndpoints } from "./routes/popup.js";
 import { refreshMetafield } from "./middleware/refreshMetafield.middleware.js";
+import * as dotenv from 'dotenv';
 
+dotenv.config();
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 const STATIC_PATH =

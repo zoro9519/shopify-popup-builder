@@ -1,5 +1,4 @@
 import { GraphQLClient } from "graphql-request";
-import { getSessionToken } from "@shopify/app-bridge-utils";
 const handleApiResponse = ({ result, type = "restful" }) => {
   if (type == "restful") {
     if (result.status === 200) {

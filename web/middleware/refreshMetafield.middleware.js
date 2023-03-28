@@ -18,7 +18,7 @@ export const refreshMetafield = async (req, res, next) => {
 
   const popupInfo = await PopupInfo.findOne({
     shopDomain: shopDomain,
-    status: "publish",
+    status: process.env.POPUP_STATUS_PUBLISH,
   });
 
   if (popupInfo) {

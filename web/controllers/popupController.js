@@ -8,7 +8,7 @@ export const createOrUpdatePopupInfo = async (_req, res) => {
     const session = res.locals.shopify.session;
     const shopDomain = session.shop;
 
-    if (_req.body.status === "publish") {
+    if (_req.body.status === process.env.POPUP_STATUS_PUBLISH) {
       const popup_info_obj = {
         title: _req.body.title,
         description: _req.body.description,
@@ -76,7 +76,7 @@ export const getPopupInfo = async (_req, res) => {
     const shopDomain = session.shop;
     const popupInfo = await PopupInfo.findOne({
       shopDomain: shopDomain,
-      status: "save",
+      status: process.env.POPUP_STATUS_SAVE,
     });
     if (popupInfo === null) {
       res.send(false);
@@ -87,3 +87,4 @@ export const getPopupInfo = async (_req, res) => {
     console.log(error);
   }
 };
+
