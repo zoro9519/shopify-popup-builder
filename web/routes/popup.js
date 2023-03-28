@@ -20,7 +20,6 @@ export function applyPopupEndpoints(app) {
 
       res.status(200).send(response.body);
     } catch (error) {
-      console.log(error?.response?.errors);
       res.status(500).send(error.message);
     }
   });

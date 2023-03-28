@@ -31,6 +31,7 @@ export default function HomePage() {
   const [active, setActive] = useState(false);
   const toggleActive = useCallback(() => setActive((active) => !active), []);
   const [loadingSaveButton, setLoadingSaveButton] = useState(false);
+  const [flag, setFlag] = useState(false);
   const fetch = useAuthenticatedFetch();
   const method = "POST";
 
@@ -285,15 +286,15 @@ export default function HomePage() {
     const res = await getFileByIdService(fileCreated.id, "IMAGE");
     const imgUrl = res.data.node.image.originalSrc;
     setImg(imgUrl);
+    setFlag(true);
   };
 
   useEffect(() => {
     if (file) uploadImgHandle(file);
   }, [file]);
 
-  const validImageTypes = ["image/gif", "image/jpeg", "image/png"];
   const fileUpload = <DropZone.FileUpload />;
-  const uploadedFile = file && img && (
+  const uploadedFile = file && img && flag && (
     <div>
       <img
         style={{
