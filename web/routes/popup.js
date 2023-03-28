@@ -15,7 +15,7 @@ export function applyPopupEndpoints(app) {
 
       const response = await shopify.api.clients.graphqlProxy({
         session,
-        rawBody: req.body, // From my app
+        rawBody: req.body,
       });
 
       res.status(200).send(response.body);

@@ -1,23 +1,17 @@
-import { disable } from "@shopify/app-bridge/actions/LeaveConfirmation";
 import {
-  Card,
   Page,
   Layout,
-  Image,
-  Badge,
-  ButtonGroup,
-  FullscreenBar,
   TextField,
   Button,
   Toast,
   Frame,
 } from "@shopify/polaris";
-import { DropZone, Thumbnail } from "@shopify/polaris";
-import { NoteMinor } from "@shopify/polaris-icons";
-import useGraphql from "../hooks/useGraphql";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, createContext } from "react";
 import { useAuthenticatedFetch } from "../hooks";
+import { DropImage } from "../components/dropZone";
 
+
+export const ImageContext = createContext()
 export default function HomePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -31,19 +25,27 @@ export default function HomePage() {
   const [active, setActive] = useState(false);
   const toggleActive = useCallback(() => setActive((active) => !active), []);
   const [loadingSaveButton, setLoadingSaveButton] = useState(false);
-  const [flag, setFlag] = useState(false);
   const fetch = useAuthenticatedFetch();
+  const [img, setImg] = useState('')
   const method = "POST";
+
+  const dispatchImage = (imgUrl) => {
+    setImg(imgUrl)
+  }
+
+  const imageValue = {
+    img, dispatchImage
+  }
 
   const toastMarkup = active ? (
     <Toast content="Success" onDismiss={toggleActive} />
   ) : null;
 
-  useEffect(async () => {
+  const getPopupData = async () => {
     try {
-      const getMethod = "GET";
+      const method = "GET";
       fetch("/api/popup", {
-        getMethod,
+        method,
         headers: { "Content-Type": "application/json" },
       })
         .then((response) => response.json())
@@ -72,7 +74,7 @@ export default function HomePage() {
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }
 
   const callApiHandle = async (status) => {
     status === "publish"
@@ -102,211 +104,9 @@ export default function HomePage() {
     return response;
   };
 
-  const [file, setFile] = useState();
-  const [img, setImg] = useState();
-  const gql = useGraphql();
-  const handleDropZoneDrop = useCallback(
-    (dropFiles, acceptedFiles, rejectedFiles) => {
-      setFile(acceptedFiles[0]);
-    },
-    []
-  );
-
-  const generateStagedUploadService = async ({
-    name,
-    type,
-    size,
-    resource,
-  }) => {
-    const query = `
-        mutation generateStagedUploads($input: [StagedUploadInput!]!) {
-          stagedUploadsCreate(input: $input) {
-            stagedTargets {
-              url
-              resourceUrl
-              parameters {
-                name
-                value
-              }
-            }
-          }
-        }
-      `;
-
-    const result = await gql(query, {
-      input: {
-        filename: name,
-        mimeType: type,
-        resource: "IMAGE",
-        httpMethod: "POST",
-        fileSize: size.toString(),
-      },
-    });
-
-    return result?.data?.stagedUploadsCreate?.stagedTargets?.[0];
-  };
-
-  const createFileService = async ({ alt, resourceUrl, contentType }) => {
-    const query = `
-      mutation fileCreate($files: [FileCreateInput!]!) {
-        fileCreate(files: $files) {
-          files {
-            ... on MediaImage {
-              alt
-              createdAt
-              id
-              preview {
-                image {
-                  originalSrc
-                }
-              }
-              status
-            }
-            ... on Video {
-              alt
-              createdAt
-              filename
-              id
-              duration
-              status
-              preview {
-                image {
-                  url
-                }
-              }
-              originalSource {
-                url
-              }
-            }
-            ... on GenericFile {
-              id
-              alt
-              createdAt
-              fileStatus
-              mimeType
-              url
-            }
-          }
-          userErrors {
-            field
-            message
-          }
-        }
-      }
-    `;
-    const result = await gql(query, {
-      files: {
-        alt,
-        originalSource: resourceUrl,
-        contentType: "IMAGE",
-      },
-    });
-    return result?.data?.fileCreate?.files?.[0];
-  };
-
-  const getFileByIdService = async (fileId, type) => {
-    const query = `
-      query getImageById($id: ID!) {
-        node(id: $id) {
-          ... on MediaImage {
-            alt
-            createdAt
-            status
-            image {
-              originalSrc
-              width
-              height
-            }
-            id
-          }
-          ... on Video {
-            alt
-            createdAt
-            filename
-            id
-            status
-            duration
-            preview {
-              image {
-                url
-              }
-            }
-            originalSource {
-              url
-            }
-          }
-          ... on GenericFile {
-            alt
-            createdAt
-            fileStatus
-            id
-            url
-          }
-        }
-      }
-    `;
-
-    const result = await gql(query, { id: fileId });
-    return result;
-  };
-
-  const uploadImgHandle = async (file) => {
-    const { name, size, type } = file;
-    let mediaType = "image";
-    const result = await generateStagedUploadService({
-      name,
-      type,
-      size,
-      resource: mediaType,
-    });
-    const { url, parameters, resourceUrl } = result;
-
-    const formData = new FormData();
-    parameters.forEach(({ name, value: valueInp }) => {
-      formData.append(name, valueInp);
-    });
-
-    formData.append("file", file);
-
-    const method = "POST";
-    const response = await fetch(url, {
-      method,
-      body: formData,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      },
-    });
-    const fileCreated = await createFileService({
-      alt: file.alt,
-      resourceUrl,
-      contentType: mediaType,
-    });
-
-    const res = await getFileByIdService(fileCreated.id, "IMAGE");
-    const imgUrl = res.data.node.image.originalSrc;
-    setImg(imgUrl);
-    setFlag(true);
-  };
-
-  useEffect(() => {
-    if (file) uploadImgHandle(file);
-  }, [file]);
-
-  const fileUpload = <DropZone.FileUpload />;
-  const uploadedFile = file && img && flag && (
-    <div>
-      <img
-        style={{
-          width: "204px",
-          height: "170px",
-          verticalAlign: "middle",
-          borderRadius: "5px",
-        }}
-        src={img}
-      />
-    </div>
-  );
+  useEffect(async () => {
+    getPopupData()
+  }, []);
 
   useEffect(() => {
     setBtnDisable(true);
@@ -374,7 +174,7 @@ export default function HomePage() {
             <input
               type="color"
               id="style1"
-              name="favcolor"
+              name="bgColor"
               value={bgColor}
               onChange={(e) => {
                 setBgColor(e.target.value);
@@ -389,7 +189,7 @@ export default function HomePage() {
             <input
               type="color"
               id="style1"
-              name="favcolor"
+              name="btnColor"
               value={btnColor}
               onChange={(e) => {
                 setBtnColor(e.target.value);
@@ -399,11 +199,10 @@ export default function HomePage() {
           <p style={{ marginTop: "10px" }}>Text Color: </p>
           <div style={{ display: "flex" }}>
             <input type="text" value={textColor} />
-
             <input
               type="color"
               id="style1"
-              name="favcolor"
+              name="textColor"
               value={textColor}
               onChange={(e) => {
                 setTextColor(e.target.value);
@@ -411,22 +210,9 @@ export default function HomePage() {
             />
           </div>
           <p style={{ marginTop: "20px" }}>Image: </p>
-          <div style={{ display: "flex", marginTop: "10px" }}>
-            {uploadedFile}
-            <div
-              style={{ width: "114px", height: "114px", marginLeft: "20px" }}
-            >
-              <DropZone
-                allowMultiple={false}
-                onDrop={handleDropZoneDrop}
-                accept="image/*"
-                type="image"
-                overlayText="Add Image"
-              >
-                {fileUpload}
-              </DropZone>
-            </div>
-          </div>
+          <ImageContext.Provider value={imageValue}>
+            <DropImage />
+          </ImageContext.Provider>
         </Layout.Section>
 
         <Layout.Section secondary>
@@ -451,7 +237,6 @@ export default function HomePage() {
             >
               <div className="flex">
                 <img src={img} width={450} height={300} />
-                {/* <button className="btn-close">⨉</button> */}
               </div>
               <div className="text-container">
                 <h1 style={{ color: textColor }}>{title}</h1>

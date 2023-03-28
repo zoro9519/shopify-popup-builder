@@ -1,22 +1,22 @@
-import { DropZone, Thumbnail } from "@shopify/polaris";
-import { NoteMinor } from "@shopify/polaris-icons";
+import { DropZone } from "@shopify/polaris";
 import { useState, useCallback, useEffect, useContext } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import useGraphql from "../hooks/useGraphql";
-import { imageContext } from "../App";
-export function DropZoneExample() {
+import { ImageContext } from "../pages";
+import { Spinner } from '@shopify/polaris';
+export function DropImage() {
   const [file, setFile] = useState();
   const fetch = useAuthenticatedFetch();
   const gql = useGraphql();
-  const { imageUrl, updateImageUrl } = useContext(imageContext);
+  const [flag, setFlag] = useState(false);
+  const { img, dispatchImage } = useContext(ImageContext);
+  const [imgLoading, setImgLoading] = useState(false);
   const handleDropZoneDrop = useCallback(
     (dropFiles, acceptedFiles, rejectedFiles) => {
       setFile(acceptedFiles[0]);
     },
     []
   );
-
-  updateImageUrl('aa')
 
   const generateStagedUploadService = async ({
     name,
@@ -157,6 +157,7 @@ export function DropZoneExample() {
   };
 
   const uploadImgHandle = async (file) => {
+    setImgLoading(true)
     const { name, size, type } = file;
     let mediaType = "image";
     const result = await generateStagedUploadService({
@@ -174,7 +175,7 @@ export function DropZoneExample() {
     formData.append("file", file);
 
     const method = "POST";
-    const response = await fetch(url, {
+    await fetch(url, {
       method,
       body: formData,
       headers: {
@@ -189,36 +190,48 @@ export function DropZoneExample() {
     });
 
     const res = await getFileByIdService(fileCreated.id, "IMAGE");
-    console.log(res);
+    const imgUrl = res.data.node.image.originalSrc;
+    dispatchImage(imgUrl)
+    setFlag(true);
+    setImgLoading(false)
   };
+
+  const fileUpload = <DropZone.FileUpload />;
+  const uploadedFile = file && flag && (
+    <div>
+      <img
+        style={{
+          width: "204px",
+          height: "170px",
+          verticalAlign: "middle",
+          borderRadius: "5px",
+        }}
+        src={img}
+      />
+    </div>
+  );
 
   useEffect(() => {
     if (file) uploadImgHandle(file);
   }, [file]);
 
-  const validImageTypes = ["image/gif", "image/jpeg", "image/png"];
-  const fileUpload = !file && <DropZone.FileUpload />;
-  const uploadedFile = file && (
-    <div>
-      <Thumbnail
-        size="small"
-        alt={file.name}
-        source={
-          validImageTypes.includes(file.type)
-            ? window.URL.createObjectURL(file)
-            : NoteMinor
-        }
-      />
-      <div>
-        {file.name} <p>{file.size} bytes</p>
+  return (
+    <div style={{ display: "flex", marginTop: "10px" }}>
+      {!imgLoading && uploadedFile}
+      {imgLoading && <Spinner accessibilityLabel="Spinner example" size="large" />}
+      <div
+        style={{ width: "114px", height: "114px", marginLeft: "20px" }}
+      >
+        <DropZone
+          allowMultiple={false}
+          onDrop={handleDropZoneDrop}
+          accept="image/*"
+          type="image"
+          overlayText="Add Image"
+        >
+          {fileUpload}
+        </DropZone>
       </div>
     </div>
-  );
-
-  return (
-    <DropZone allowMultiple={false} onDrop={handleDropZoneDrop}>
-      {uploadedFile}
-      {fileUpload}
-    </DropZone>
   );
 }
